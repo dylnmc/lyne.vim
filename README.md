@@ -84,7 +84,7 @@ flag, and data.
 Since the flag is the easiest to understand, let's start with that. The flag is
 always the second character in the token, and it determines what kind of padding
 the token will use. `:` pads the token with space on both sides, `<` pads space
-only on the left, `>` pads space only on the right, and `|` adds no space.
+only on the right, `>` pads space only on the left, and `|` adds no space.
 
 I have opted to use `|` for all of the highlight groups in the default settings,
 so you might have noted `h|LyneMode`, `h|LyneBufname`, etc in the defaults. This

@@ -1,7 +1,7 @@
 
 " post-compile-functions
 
-function! lyne#utils#update_separators()
+function! lyne#utils#update_mode_separators(c, winnr)
 	let l:hls_active = lyne#get_hls_active()
 	let l:hls_inactive = lyne#get_hls_inactive()
 	for l:side in ['left', 'right']
@@ -14,7 +14,7 @@ endfunction
 
 " pre-functions
 
-function! lyne#utils#update_bufname()
+function! lyne#utils#update_bufname(c, winnr)
 	if (&modified)
 		highlight! link LyneBufname LyneBufnameModified
 	else
@@ -25,11 +25,11 @@ endfunction
 
 " post-functions
 
-function! lyne#utils#update_mode()
+function! lyne#utils#update_mode(c, winnr)
 	execute 'highlight! link LyneMode LyneMode'.lyne#get_mode_hl()[mode(1)]
 endfunction
 
-function! lyne#utils#update_separators()
+function! lyne#utils#update_separators(c, winnr)
 	let l:hls_active = lyne#get_hls_active()
 	let l:hls_inactive = lyne#get_hls_inactive()
 	for l:side in ['left', 'right']

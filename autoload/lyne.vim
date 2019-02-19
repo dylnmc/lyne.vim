@@ -28,6 +28,7 @@ function! lyne#statusline(c)
 	endif
 
 	let l:defaultHl = 'StatusLine'.(a:c ? '' : 'NC')
+	let l:pad = ['', ' ']
 
 	let l:prevHl = ''
 	for l:side in ['left', 'right']
@@ -36,34 +37,24 @@ function! lyne#statusline(c)
 		let l:segNum = 0
 		let l:segMax = len(l:segs)
 		for l:seg in l:segs
-			let l:type = l:seg[:1]
-			let l:flag = l:seg[1:1]
+			if len(l:seg) < 2
+				continue
+			endif
+			let l:type = l:seg[0]
+			let l:flag = l:seg[1]
 			let l:data = l:seg[2:]
-			if (l:type[0] ==# 'h')
-				if empty(l:data)
-					let l:data = l:defaultHl
-				endif
+			if (l:type ==# 'h')
 				let l:data = split(l:data, ':', 1)
-				if len(l:data) ==# 1
-					let l:sep = get(s:separators, l:side)
-				else
-					let l:sep = join(l:data[1:], ':')
-				endif
-				let l:data = l:data[0]
-				if (l:prevHl !=# l:data)
-					let l:stl .= l:type =~# '[<:]' ? ' ' : ''
-					if (!((l:segNum ==# 0 && l:side ==# 'left') || empty(l:sep)))
-						let l:stl .= '%#'.join([l:side, l:prevHl, l:data], '_').'#'.l:sep
-						call add(l:hls[l:side], [l:prevHl, l:data])
-					endif
-					let l:stl .= '%#'.l:data.'#'.(l:type =~# '[>:]' ? ' ' : '')
-					let l:prevHl = l:data
-				endif
-			elseif (l:type[0] ==# 'e')
-				let l:stl .= (l:type =~# '[>:]' ? ' ' : '').l:data.(l:type =~# '[<:]' ? ' ' : '')
-			elseif (l:type[0] ==# 'r')
-				let l:stl .= '%{lyne#func_wrap('.join([string(l:data), a:c, "'".l:flag."'"], ',').')}'
-			elseif (l:type[0] ==# 'f')
+				let l:sep = len(l:data) ==# 1 ? get(s:separators, l:side) : join(l:data[1:], ':')
+				let l:data = empty(l:data[0]) ? l:defaultHl : l:data[0]
+				let l:stl .= l:pad[l:flag =~# '[>:]'].'%#'.join([l:side, l:prevHl, l:data], '_').'#'.l:sep.'%#'.l:data.'#'.l:pad[l:flag =~# '[<:]']
+				call add(l:hls[l:side], [l:prevHl, l:data])
+				let l:prevHl = l:data
+			elseif (l:type ==# 'e')
+				let l:stl .= l:pad[l:flag =~# '[>:]'].l:data.l:pad[l:flag =~# '[<:]']
+			elseif (l:type ==# 'r')
+				let l:stl .= '%{lyne#func_wrap('.join([string(l:data), a:c, string(l:flag)], ',').')}'
+			elseif (l:type ==# 'f')
 				let l:stl .= lyne#func_wrap(l:data, a:c, l:flag)
 			endif
 			let l:segNum += 1
@@ -78,7 +69,7 @@ function! lyne#statusline(c)
 	endif
 
 	for l:fun in s:post_compile_functions
-		call call(l:fun, [a:c, -1])
+		silent! call call(l:fun, [a:c, -1])
 	endfor
 
 	return l:stl
@@ -131,14 +122,14 @@ endfunction
 
 function! lyne#pre()
 	for l:func in s:pre_functions
-		silent! call call(l:func, [])
+		silent! call call(l:func, [-1, winnr()])
 	endfor
 	return ''
 endfunction
 
 function! lyne#post()
 	for l:func in lyne#get_post_functions()
-		silent! call call(l:func, [])
+		silent! call call(l:func, [-1, winnr()])
 	endfor
 	return ''
 endfunction
@@ -148,37 +139,37 @@ function! lyne#func_wrap(func, c, flag)
 	return (a:flag =~# '[>:]' ? ' ' : '').l:result.(a:flag =~# '[<:]' ? ' ' : '')
 endfunction
 
-function! lyne#get_active()
+function! lyne#get_active(...)
 	return copy(s:active)
 endfunction
-function! lyne#get_inactive()
+function! lyne#get_inactive(...)
 	return copy(s:inactive)
 endfunction
-function! lyne#get_separators()
+function! lyne#get_separators(...)
 	return copy(s:separators)
 endfunction
-function! lyne#get_mode_hl()
+function! lyne#get_mode_hl(...)
 	return copy(s:mode_hl)
 endfunction
 function! lyne#get_mode(...)
 	return copy(s:mode_map[mode(1)])
 endfunction
-function! lyne#get_pre_functions()
+function! lyne#get_pre_functions(...)
 	return copy(s:pre_functions)
 endfunction
-function! lyne#get_post_functions()
+function! lyne#get_post_functions(...)
 	return copy(s:post_functions)
 endfunction
-function! lyne#get_pre_compile_functions()
+function! lyne#get_pre_compile_functions(...)
 	return copy(s:pre_compile_functions)
 endfunction
-function! lyne#get_post_compile_functions()
+function! lyne#get_post_compile_functions(...)
 	return copy(s:post_compile_functions)
 endfunction
-function! lyne#get_hls_active()
+function! lyne#get_hls_active(...)
 	return copy(s:hls_active)
 endfunction
-function! lyne#get_hls_inactive()
+function! lyne#get_hls_inactive(...)
 	return copy(s:hls_inactive)
 endfunction
 
