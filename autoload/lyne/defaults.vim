@@ -14,7 +14,7 @@ let s:active = {
 \}
 
 let s:inactive = {
-\	'left': ['e:%f%<%h%w%m%r'],
+\	'left': ['r>lyne#utils#get_bufname', 'e|%<', 'r<lyne#utils#get_bufflags'],
 \	'right': ['e:%p%%']
 \}
 

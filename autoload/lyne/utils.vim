@@ -77,7 +77,7 @@ function! lyne#utils#get_bufname(c, winnr)
 	if l:ft ==# 'help'
 		return fnamemodify(l:bufname, ':t')
 	endif
-	return (empty(l:bufname) ? '[no name]' : fnamemodify(l:bufname, ':p:~:.')) " .l:flags
+	return (empty(l:bufname) ? '[no name]' : substitute(substitute(fnamemodify(l:bufname, ':p'), '^\V'.escape(getcwd(a:winnr), '\/').'\/', '', ''), '^\V'.escape($HOME, '\/'), '~', ''))
 endfunction
 
 function! lyne#utils#get_bufflags(c, winnr)
